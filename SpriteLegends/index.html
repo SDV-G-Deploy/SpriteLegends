@@ -1,0 +1,179 @@
+﻿<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprite Legends: Reforged</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="game.js" defer></script>
+</head>
+<body>
+  <div class="atmo atmo-a"></div>
+  <div class="atmo atmo-b"></div>
+
+  <main class="app">
+    <header class="title-wrap">
+      <h1>Sprite Legends: Reforged</h1>
+      <p>Переработанная roguelite-кампания с процедурными боями, перками и честным телеграфом атак.</p>
+    </header>
+
+    <section id="start-screen" class="panel active">
+      <article class="cover-card">
+        <img src="../SPRITES/Sprite_main_image_oblozhka2.png" alt="Отряд героев">
+      </article>
+
+      <article class="start-card">
+        <h2>Что обновлено</h2>
+        <ul>
+          <li>Пошаговая AP-система: несколько действий за ход.</li>
+          <li>Видно намерение врага до твоего решения.</li>
+          <li>Случайная генерация энкаунтеров по seed.</li>
+          <li>После каждого боя выбор одного из 3 перков.</li>
+        </ul>
+
+        <div class="setup-grid">
+          <div>
+            <p class="label">Сложность</p>
+            <div id="difficulty-group" class="difficulty-group">
+              <button type="button" data-difficulty="story" class="diff-btn">История</button>
+              <button type="button" data-difficulty="normal" class="diff-btn active">Норма</button>
+              <button type="button" data-difficulty="heroic" class="diff-btn">Героик</button>
+            </div>
+            <p id="difficulty-desc" class="difficulty-desc"></p>
+          </div>
+
+          <div>
+            <p class="label">Seed забега</p>
+            <div class="seed-row">
+              <input id="seed-input" maxlength="16" placeholder="AUTO" autocomplete="off">
+              <button id="reroll-seed-btn" type="button" class="ghost-btn">Новый</button>
+            </div>
+            <p class="seed-hint">Одинаковый seed = одинаковый порядок врагов и перков.</p>
+          </div>
+        </div>
+
+        <div class="start-actions">
+          <button id="start-btn" class="main-btn" type="button">Начать кампанию</button>
+          <p id="meta-best" class="meta-best">Лучший результат: 0</p>
+        </div>
+      </article>
+    </section>
+
+    <section id="selection-screen" class="panel">
+      <h2>Выбор героя</h2>
+      <p class="sub">Каждый герой имеет уникальную спец-способность и пассив.</p>
+      <div id="hero-grid" class="hero-grid"></div>
+      <div class="selection-actions">
+        <button id="back-btn" class="ghost-btn" type="button">Назад</button>
+      </div>
+    </section>
+
+    <section id="battle-screen" class="panel">
+      <div class="battle-head">
+        <div class="run-info">
+          <p id="run-seed">Seed: -</p>
+          <p id="encounter-label">Бой 1 / 6</p>
+          <p id="turn-label">Ход: 1</p>
+        </div>
+        <div class="ap-wrap">
+          <p>Твои очки действий</p>
+          <div id="ap-dots" class="ap-dots"></div>
+        </div>
+      </div>
+
+      <div class="battle-main">
+        <article class="unit hero-unit">
+          <h3 id="hero-name">Герой</h3>
+          <div class="sprite-box">
+            <img id="hero-sprite" src="" alt="Герой">
+          </div>
+          <div class="bars">
+            <div class="bar hp"><span id="hero-hp-bar"></span></div>
+            <p id="hero-hp-text">0 / 0 HP</p>
+            <div class="bar block"><span id="hero-block-bar"></span></div>
+            <p id="hero-block-text">Блок: 0</p>
+          </div>
+          <div id="hero-statuses" class="status-row"></div>
+        </article>
+
+        <section class="center-panel">
+          <div class="intent-card">
+            <p class="label">Намерение врага</p>
+            <h4 id="intent-name">-</h4>
+            <p id="intent-desc">-</p>
+          </div>
+
+          <div class="actions">
+            <button id="attack-btn" class="action-btn" type="button">Удар (1 AP)</button>
+            <button id="special-btn" class="action-btn" type="button">Способность (2 AP)</button>
+            <button id="guard-btn" class="action-btn" type="button">Защита (1 AP)</button>
+            <button id="potion-btn" class="action-btn" type="button">Зелье (1 AP)</button>
+            <button id="end-turn-btn" class="action-btn end-turn" type="button">Завершить ход</button>
+          </div>
+
+          <div class="resource-line">
+            <p>Зелья: <strong id="potion-count">0</strong></p>
+            <p>КД способности: <strong id="special-cd">0</strong></p>
+            <p>Серия ударов: <strong id="combo-count">x1</strong></p>
+          </div>
+
+          <section class="log-wrap">
+            <h4>Журнал боя</h4>
+            <div id="log" class="log"></div>
+          </section>
+        </section>
+
+        <aside class="unit enemy-unit">
+          <h3 id="enemy-name">Враг</h3>
+          <div class="sprite-box">
+            <img id="enemy-sprite" src="" alt="Враг">
+          </div>
+          <div class="bars">
+            <div class="bar enemy-hp"><span id="enemy-hp-bar"></span></div>
+            <p id="enemy-hp-text">0 / 0 HP</p>
+            <div class="bar block enemy-block"><span id="enemy-block-bar"></span></div>
+            <p id="enemy-block-text">Блок: 0</p>
+          </div>
+          <div id="enemy-statuses" class="status-row"></div>
+          <p id="enemy-affix" class="enemy-affix"></p>
+          <div class="relic-panel">
+            <h4>Перки забега</h4>
+            <div id="relic-list" class="relic-list"></div>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="battle-footer">
+        <button id="retreat-btn" class="ghost-btn danger" type="button">Сдаться</button>
+      </footer>
+    </section>
+
+    <section id="reward-screen" class="panel">
+      <h2>Награда за бой</h2>
+      <p id="reward-text" class="sub"></p>
+      <div id="reward-grid" class="reward-grid"></div>
+      <div class="selection-actions">
+        <button id="skip-reward-btn" class="ghost-btn" type="button">Пропустить (+12 HP)</button>
+      </div>
+    </section>
+
+    <section id="event-screen" class="panel">
+      <h2 id="event-title">Случайная встреча</h2>
+      <p id="event-text" class="sub"></p>
+      <div id="event-grid" class="reward-grid"></div>
+    </section>
+
+    <section id="result-screen" class="panel">
+      <h2 id="result-title">Результат</h2>
+      <p id="result-text"></p>
+      <div class="result-stats">
+        <p id="result-score">Счет: 0</p>
+        <p id="result-best">Лучший счет: 0</p>
+      </div>
+      <button id="play-again-btn" class="main-btn" type="button">Новый забег</button>
+    </section>
+  </main>
+</body>
+</html>
+
+
